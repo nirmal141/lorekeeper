@@ -7,6 +7,7 @@ interface DialogueEntry {
   speaker: "player" | "narrator" | string;
   text: string;
   memories?: string[];
+  choices?: string[];
 }
 
 interface Props {
@@ -29,6 +30,14 @@ export default function DialogueBox({ entries, loading, onSend, npcName }: Props
     onSend(input.trim());
     setInput("");
   };
+
+  const handleChoice = (choice: string) => {
+    if (loading) return;
+    onSend(choice);
+  };
+
+  const lastEntry = entries[entries.length - 1];
+  const showChoices = lastEntry && lastEntry.choices && lastEntry.choices.length > 0 && !loading;
 
   return (
     <div className="dialogue-box">
@@ -61,7 +70,7 @@ export default function DialogueBox({ entries, loading, onSend, npcName }: Props
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <span className="db-mem-label">⟡ memories recalled</span>
+                  <span className="db-mem-label">memories recalled</span>
                   {entry.memories.map((m, j) => (
                     <p key={j} className="db-mem-text">{m}</p>
                   ))}
@@ -87,13 +96,42 @@ export default function DialogueBox({ entries, loading, onSend, npcName }: Props
         )}
       </div>
 
+      {showChoices && (
+        <motion.div
+          className="db-choices"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          {lastEntry.choices!.map((choice, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 * i }}
+            >
+              <Button
+                onClick={() => handleChoice(choice)}
+                bg="#16213e"
+                textColor="#f1c40f"
+                shadow="#0a0a14"
+                borderColor="#533483"
+                className="db-choice-btn"
+              >
+                {choice}
+              </Button>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+
       <div className="db-input-row">
         <input
           className="db-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder={`Say something to ${npcName}...`}
+          placeholder={showChoices ? "Or say something else..." : `Say something to ${npcName}...`}
           disabled={loading}
         />
         <Button

@@ -6,9 +6,11 @@ import {
   type WorldState,
   type WorldEvent,
   type SimulationResult,
+  type NarrativeRecap,
   getWorld,
   getNPCs,
   getEvents,
+  getRecap,
   chatWithNPC,
   simulateWorld,
 } from "../api";
@@ -20,6 +22,7 @@ interface DialogueEntry {
   speaker: "player" | "narrator" | string;
   text: string;
   memories?: string[];
+  choices?: string[];
 }
 
 export default function GameWorld() {
@@ -32,6 +35,7 @@ export default function GameWorld() {
   const [simulating, setSimulating] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
   const [latestResult, setLatestResult] = useState<SimulationResult | null>(null);
+  const [latestRecap, setLatestRecap] = useState<NarrativeRecap | null>(null);
 
   const npcNames: Record<string, string> = {};
   npcs.forEach((n) => { npcNames[n.id] = n.personality.name; });
@@ -69,6 +73,7 @@ export default function GameWorld() {
           speaker: selectedNpc.personality.name,
           text: res.npc_dialogue,
           memories: res.memories_retrieved,
+          choices: res.choices,
         },
       ]);
     } catch {
@@ -84,6 +89,13 @@ export default function GameWorld() {
     try {
       const result = await simulateWorld();
       setLatestResult(result);
+
+      let recap: NarrativeRecap | null = null;
+      try {
+        recap = await getRecap();
+      } catch { /* recap is optional */ }
+      setLatestRecap(recap);
+
       setShowOverlay(true);
     } catch {
       setDialogue((prev) => [
@@ -124,15 +136,12 @@ export default function GameWorld() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Top bar */}
       <div className="gw-topbar">
         <span className="gw-title">Lorekeeper</span>
         <span className="gw-hours">Day {Math.floor((world?.hours_passed ?? 0) / 24) + 1} · Hour {(world?.hours_passed ?? 0) % 24}</span>
       </div>
 
-      {/* Main area */}
       <div className="gw-main">
-        {/* Left: World info */}
         <div className="gw-sidebar">
           <Card bg="#16213e" textColor="#e0e0e0" borderColor="#533483" shadowColor="#0a0a14" className="gw-card">
             <h3 className="gw-card-title">The Trading Post</h3>
@@ -156,7 +165,6 @@ export default function GameWorld() {
           </Card>
         </div>
 
-        {/* Center: NPC area or dialogue */}
         <div className="gw-center">
           <AnimatePresence mode="wait">
             {!selectedNpc ? (
@@ -170,27 +178,17 @@ export default function GameWorld() {
                 <p className="gw-prompt">Who would you like to speak with?</p>
                 <div className="gw-npcs">
                   {npcs.map((npc) => (
-                    <motion.div
-                      key={npc.id}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                    >
+                    <motion.div key={npc.id} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                       <div onClick={() => handleTalkToNPC(npc)}>
-                      <Card
-                        bg="#0f3460"
-                        textColor="#e0e0e0"
-                        borderColor="#533483"
-                        shadowColor="#0a0a14"
-                        className="gw-npc-card"
-                      >
-                        <div className="gw-npc-name">{npc.personality.name}</div>
-                        <div className="gw-npc-role">{npc.personality.role}</div>
-                        <div className="gw-npc-mood">
-                          <span className="gw-mood-dot" style={{ background: npc.current_mood === "neutral" ? "#6a6a8a" : "#f1c40f" }} />
-                          {npc.current_mood}
-                        </div>
-                        <div className="gw-npc-goal">{npc.personality.goals[0]}</div>
-                      </Card>
+                        <Card bg="#0f3460" textColor="#e0e0e0" borderColor="#533483" shadowColor="#0a0a14" className="gw-npc-card">
+                          <div className="gw-npc-name">{npc.personality.name}</div>
+                          <div className="gw-npc-role">{npc.personality.role}</div>
+                          <div className="gw-npc-mood">
+                            <span className="gw-mood-dot" style={{ background: npc.current_mood === "neutral" ? "#6a6a8a" : "#f1c40f" }} />
+                            {npc.current_mood}
+                          </div>
+                          <div className="gw-npc-goal">{npc.personality.goals[0]}</div>
+                        </Card>
                       </div>
                     </motion.div>
                   ))}
@@ -204,7 +202,7 @@ export default function GameWorld() {
                   className="gw-pass-btn"
                   disabled={simulating}
                 >
-                  {simulating ? "Simulating..." : "⏳ Pass Time"}
+                  {simulating ? "Simulating..." : "Pass Time"}
                 </Button>
               </motion.div>
             ) : (
@@ -216,14 +214,7 @@ export default function GameWorld() {
                 exit={{ opacity: 0, y: -20 }}
               >
                 <div className="gw-dialogue-header">
-                  <Button
-                    onClick={handleBack}
-                    bg="#16213e"
-                    textColor="#e0e0e0"
-                    shadow="#0a0a14"
-                    borderColor="#533483"
-                    className="gw-back-btn"
-                  >
+                  <Button onClick={handleBack} bg="#16213e" textColor="#e0e0e0" shadow="#0a0a14" borderColor="#533483" className="gw-back-btn">
                     ← Back
                   </Button>
                   <span className="gw-talking-to">Speaking with {selectedNpc.personality.name}</span>
@@ -244,6 +235,7 @@ export default function GameWorld() {
       <CinematicOverlay
         visible={showOverlay}
         result={latestResult}
+        recap={latestRecap}
         npcNames={npcNames}
         onDone={handleOverlayDone}
       />

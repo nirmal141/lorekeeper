@@ -122,6 +122,28 @@
   40% { opacity: 1; transform: scale(1.2); }
 }
 
+/* Choices */
+.db-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px dashed rgba(241, 196, 15, 0.2);
+}
+
+.db-choice-btn {
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  padding: 8px 14px !important;
+  cursor: pointer;
+  text-align: left !important;
+  transition: all 0.15s;
+}
+
+.db-choice-btn:hover {
+  transform: translateX(3px);
+}
+
 /* Input */
 .db-input-row {
   display: flex;

@@ -7,6 +7,7 @@ from backend.core.config import Settings
 from backend.temporal.workflows import (
     WorldSimulationWorkflow,
     generate_world_event_activity,
+    update_npc_gossip_activity,
     update_npc_memory_activity,
 )
 
@@ -21,7 +22,7 @@ async def run_worker():
         client,
         task_queue=TASK_QUEUE,
         workflows=[WorldSimulationWorkflow],
-        activities=[generate_world_event_activity, update_npc_memory_activity],
+        activities=[generate_world_event_activity, update_npc_memory_activity, update_npc_gossip_activity],
     )
 
     print(f"Temporal worker started on queue: {TASK_QUEUE}")

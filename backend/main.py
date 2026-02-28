@@ -8,8 +8,9 @@ from temporalio.client import Client
 
 from backend.core.config import Settings
 from backend.core.database import get_db, get_npc, get_npcs, get_world_state, save_world_event, update_npc_mood
-from backend.core.models import ChatRequest, ChatResponse, NPC, SimulationResult, WorldEvent, WorldState
+from backend.core.models import ChatRequest, ChatResponse, NarrativeRecap, NPC, SimulationResult, WorldEvent, WorldState
 from backend.services.npc_service import NPCService
+from backend.services.world_service import WorldService
 from backend.core.seed import seed
 from backend.temporal.workflows import SimulateInput, WorldSimulationWorkflow
 
@@ -17,6 +18,7 @@ TASK_QUEUE = "lorekeeper"
 
 settings = Settings()
 npc_service = NPCService(settings)
+world_service = WorldService(settings)
 
 
 @asynccontextmanager
@@ -131,3 +133,15 @@ def get_events():
         ]
     finally:
         conn.close()
+
+
+@app.get("/world/recap", response_model=NarrativeRecap)
+def get_recap():
+    conn = get_db(settings)
+    try:
+        world_state = get_world_state(conn)
+        npcs = get_npcs(conn)
+    finally:
+        conn.close()
+
+    return world_service.generate_recap(world_state, npcs)

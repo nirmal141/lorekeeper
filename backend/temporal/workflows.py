@@ -6,7 +6,7 @@ from temporalio import activity, workflow
 
 with workflow.unsafe.imports_passed_through():
     from backend.core.config import Settings
-    from backend.core.models import NPC, SimulationResult, WorldEvent, WorldState
+    from backend.core.models import GossipItem, NPC, SimulationResult, WorldEvent, WorldState
 
 
 @dataclass
@@ -20,6 +20,12 @@ class SimulateInput:
 class UpdateNPCInput:
     npc_id: str
     event_json: str
+    settings_json: str
+
+
+@dataclass
+class GossipInput:
+    gossip_json: str
     settings_json: str
 
 
@@ -47,6 +53,17 @@ async def update_npc_memory_activity(input: UpdateNPCInput) -> None:
     service.add_world_event_to_npc(input.npc_id, event)
 
 
+@activity.defn
+async def update_npc_gossip_activity(input: GossipInput) -> None:
+    from backend.services.npc_service import NPCService
+
+    settings = Settings(**json.loads(input.settings_json))
+    gossip = GossipItem(**json.loads(input.gossip_json))
+
+    service = NPCService(settings)
+    service.add_gossip_to_npc(gossip)
+
+
 @workflow.defn
 class WorldSimulationWorkflow:
     @workflow.run
@@ -66,6 +83,16 @@ class WorldSimulationWorkflow:
                 UpdateNPCInput(
                     npc_id=npc_id,
                     event_json=result.event.model_dump_json(),
+                    settings_json=settings_json,
+                ),
+                start_to_close_timeout=timedelta(seconds=15),
+            )
+
+        for gossip in result.gossip:
+            await workflow.execute_activity(
+                update_npc_gossip_activity,
+                GossipInput(
+                    gossip_json=gossip.model_dump_json(),
                     settings_json=settings_json,
                 ),
                 start_to_close_timeout=timedelta(seconds=15),

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Optional
 
@@ -7,7 +8,7 @@ from llama_index.core.base.embeddings.base import BaseEmbedding
 from llama_index.embeddings.gemini import GeminiEmbedding
 
 from backend.core.config import Settings
-from backend.core.models import ChatRequest, ChatResponse, Memory, NPC, WorldEvent, WorldState
+from backend.core.models import ChatRequest, ChatResponse, GossipItem, Memory, NPC, WorldEvent, WorldState
 
 
 class NPCService:
@@ -77,13 +78,29 @@ YOUR MEMORIES OF THIS PLAYER:
 
 The player says: "{request.player_message}"
 
-Respond in character as {npc.personality.name}. Be concise (2-4 sentences). Reference your memories of this player if relevant. React to recent world events if they affect you. Stay in character."""
+Respond in character as {npc.personality.name}. Be concise (2-4 sentences). Reference your memories of this player if relevant. React to recent world events if they affect you. Stay in character.
+
+Respond in this EXACT JSON format (no markdown, no code blocks):
+{{"dialogue": "Your in-character response here", "choices": ["Short choice 1 (5-10 words)", "Short choice 2 (5-10 words)", "Short choice 3 (5-10 words)"]}}
+
+The choices should be things the player might say next. Make them drive the story forward."""
 
         response = self._client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt,
         )
-        npc_dialogue = response.text
+
+        text = response.text.strip()
+        if text.startswith("```"):
+            text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+
+        try:
+            data = json.loads(text)
+            npc_dialogue = data["dialogue"]
+            choices = data.get("choices", [])[:3]
+        except (json.JSONDecodeError, KeyError):
+            npc_dialogue = text
+            choices = []
 
         self._store_memory(
             npc.id,
@@ -97,6 +114,7 @@ Respond in character as {npc.personality.name}. Be concise (2-4 sentences). Refe
             npc_id=npc.id,
             npc_dialogue=npc_dialogue,
             memories_retrieved=memories,
+            choices=choices,
         )
 
     def add_world_event_to_npc(self, npc_id: str, event: WorldEvent) -> None:
@@ -105,5 +123,14 @@ Respond in character as {npc.personality.name}. Be concise (2-4 sentences). Refe
             Memory(
                 content=f"World event: {event.description}",
                 memory_type="world_event",
+            ),
+        )
+
+    def add_gossip_to_npc(self, gossip: GossipItem) -> None:
+        self._store_memory(
+            gossip.to_npc,
+            Memory(
+                content=f"Gossip from {gossip.from_npc}: {gossip.content}",
+                memory_type="npc_gossip",
             ),
         )

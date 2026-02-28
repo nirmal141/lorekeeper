@@ -23,6 +23,7 @@ export interface ChatResponse {
   npc_id: string;
   npc_dialogue: string;
   memories_retrieved: string[];
+  choices: string[];
 }
 
 export interface WorldEvent {
@@ -32,9 +33,21 @@ export interface WorldEvent {
   affected_npc_ids: string[];
 }
 
+export interface GossipItem {
+  from_npc: string;
+  to_npc: string;
+  content: string;
+}
+
 export interface SimulationResult {
   event: WorldEvent;
   npc_reactions: Record<string, string>;
+  gossip: GossipItem[];
+}
+
+export interface NarrativeRecap {
+  summary: string;
+  key_moments: string[];
 }
 
 export async function getWorld(): Promise<WorldState> {
@@ -71,5 +84,10 @@ export async function getEvents(): Promise<WorldEvent[]> {
 
 export async function getNPC(npcId: string): Promise<NPC> {
   const res = await fetch(`${BASE}/npc/${npcId}`);
+  return res.json();
+}
+
+export async function getRecap(): Promise<NarrativeRecap> {
+  const res = await fetch(`${BASE}/world/recap`);
   return res.json();
 }
