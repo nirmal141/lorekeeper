@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     db_path: str = os.path.join(_DATA, "game.db")
     index_dir: str = os.path.join(_DATA, "indexes")
     active_scenario: str = "ashwood"
+    simulation_interval_seconds: int = 1200  # Change to 7200 for 2 hours
 
     model_config = SettingsConfigDict(env_file=os.path.join(_BACKEND, ".env"))
 

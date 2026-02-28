@@ -6,6 +6,7 @@ import "./ScenarioSelect.css";
 
 interface Props {
   onSelect: (scenarioId: string) => void;
+  onHome?: () => void;
 }
 
 const GENRE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -24,7 +25,7 @@ const SCENARIO_IMAGES: Record<string, string> = {
   "byte-brew": "/byte_and_brew.png",
 };
 
-export default function ScenarioSelect({ onSelect }: Props) {
+export default function ScenarioSelect({ onSelect, onHome }: Props) {
   const [scenarios, setScenarios] = useState<ScenarioSummary[]>([]);
   const [activating, setActivating] = useState<string | null>(null);
 
@@ -35,6 +36,7 @@ export default function ScenarioSelect({ onSelect }: Props) {
   const handleSelect = async (id: string) => {
     setActivating(id);
     await activateScenario(id);
+    localStorage.setItem("lk_scenario", id);
     onSelect(id);
   };
 
@@ -46,6 +48,10 @@ export default function ScenarioSelect({ onSelect }: Props) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
+      {onHome && (
+        <button className="ss-home-btn" onClick={onHome}>Home</button>
+      )}
+
       <motion.h2
         className="ss-title"
         initial={{ y: -20, opacity: 0 }}

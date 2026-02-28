@@ -11,6 +11,8 @@ import {
   getNPCs,
   getEvents,
   getRecap,
+  getStarters,
+  activateScenario,
   chatWithNPC,
   simulateWorld,
 } from "../api";
@@ -27,9 +29,10 @@ interface DialogueEntry {
 
 interface GameWorldProps {
   onBack?: () => void;
+  onHome?: () => void;
 }
 
-export default function GameWorld({ onBack }: GameWorldProps) {
+export default function GameWorld({ onBack, onHome }: GameWorldProps) {
   const [world, setWorld] = useState<WorldState | null>(null);
   const [npcs, setNpcs] = useState<NPC[]>([]);
   const [events, setEvents] = useState<WorldEvent[]>([]);
@@ -40,27 +43,55 @@ export default function GameWorld({ onBack }: GameWorldProps) {
   const [showOverlay, setShowOverlay] = useState(false);
   const [latestResult, setLatestResult] = useState<SimulationResult | null>(null);
   const [latestRecap, setLatestRecap] = useState<NarrativeRecap | null>(null);
+  const [starters, setStarters] = useState<Record<string, string[]>>({});
 
   const npcNames: Record<string, string> = {};
   npcs.forEach((n) => { npcNames[n.id] = n.personality.name; });
 
   useEffect(() => {
-    Promise.all([getWorld(), getNPCs(), getEvents()]).then(([w, n, e]) => {
+    const init = async () => {
+      const savedScenario = localStorage.getItem("lk_scenario");
+      if (savedScenario) {
+        await activateScenario(savedScenario);
+      }
+      const [w, n, e, s] = await Promise.all([getWorld(), getNPCs(), getEvents(), getStarters()]);
       setWorld(w);
       setNpcs(n);
       setEvents(e);
+      setStarters(s);
       setDialogue([{
         speaker: "narrator",
-        text: `You arrive at the trading post. ${w.description}`,
+        text: `You arrive. ${w.description}`,
       }]);
-    });
+    };
+    init();
+
+    // Poll for auto-simulated world changes every 30s
+    const poll = setInterval(async () => {
+      try {
+        const [w, n, e] = await Promise.all([getWorld(), getNPCs(), getEvents()]);
+        if (w.hours_passed !== world?.hours_passed) {
+          setWorld(w);
+          setNpcs(n);
+          setEvents(e);
+          setDialogue((prev) => [
+            ...prev,
+            { speaker: "narrator", text: "The world has shifted while you were here..." },
+          ]);
+        }
+      } catch { /* ignore poll errors */ }
+    }, 30000);
+
+    return () => clearInterval(poll);
   }, []);
 
   const handleTalkToNPC = (npc: NPC) => {
     setSelectedNpc(npc);
+    const npcStarters = starters[npc.id] || [];
     setDialogue([{
       speaker: "narrator",
       text: `You approach ${npc.personality.name}, the ${npc.personality.role}.`,
+      choices: npcStarters,
     }]);
   };
 
@@ -142,6 +173,7 @@ export default function GameWorld({ onBack }: GameWorldProps) {
     >
       <div className="gw-topbar">
         <div className="gw-topbar-left">
+          {onHome && <button className="gw-worlds-btn" onClick={onHome}>Home</button>}
           {onBack && <button className="gw-worlds-btn" onClick={onBack}>Worlds</button>}
           <span className="gw-title">Lorekeeper</span>
         </div>
@@ -209,7 +241,7 @@ export default function GameWorld({ onBack }: GameWorldProps) {
                   className="gw-pass-btn"
                   disabled={simulating}
                 >
-                  {simulating ? "Simulating..." : "Pass Time"}
+                  {simulating ? "Simulating..." : "Fast Forward"}
                 </Button>
               </motion.div>
             ) : (

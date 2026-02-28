@@ -1,5 +1,6 @@
+import asyncio
 import json
-import shutil
+import logging
 from contextlib import asynccontextmanager
 from uuid import uuid4
 
@@ -16,6 +17,8 @@ from backend.services.npc_service import NPCService
 from backend.services.world_service import WorldService
 from backend.temporal.workflows import SimulateInput, WorldSimulationWorkflow
 
+logger = logging.getLogger("lorekeeper")
+
 TASK_QUEUE = "lorekeeper"
 
 settings = Settings()
@@ -30,11 +33,59 @@ def _npc_service() -> NPCService:
     return NPCService(_scoped())
 
 
+async def _run_auto_simulation(app: FastAPI):
+    """Background loop that simulates the world automatically."""
+    await asyncio.sleep(settings.simulation_interval_seconds)
+    while True:
+        try:
+            scoped = _scoped()
+            conn = get_db(scoped)
+            try:
+                world_state = get_world_state(conn)
+                npcs = get_npcs(conn)
+            finally:
+                conn.close()
+
+            if not npcs:
+                await asyncio.sleep(settings.simulation_interval_seconds)
+                continue
+
+            client: Client = app.state.temporal_client
+            result_json = await client.execute_workflow(
+                WorldSimulationWorkflow.run,
+                SimulateInput(
+                    world_state_json=world_state.model_dump_json(),
+                    npcs_json=json.dumps([n.model_dump() for n in npcs]),
+                    settings_json=scoped.model_dump_json(),
+                ),
+                id=f"auto-simulate-{uuid4()}",
+                task_queue=TASK_QUEUE,
+            )
+
+            result = SimulationResult.model_validate_json(result_json)
+            conn = get_db(scoped)
+            try:
+                save_world_event(conn, result.event)
+                for npc_id in result.npc_reactions:
+                    update_npc_mood(conn, npc_id, "affected")
+            finally:
+                conn.close()
+
+            logger.info(f"Auto-simulation completed for {active_scenario_id}: {result.event.description[:80]}")
+        except Exception as e:
+            logger.warning(f"Auto-simulation failed: {e}")
+
+        await asyncio.sleep(settings.simulation_interval_seconds)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     seed_all(settings)
     app.state.temporal_client = await Client.connect(settings.temporal_host)
+    # Auto-simulation disabled for now. Uncomment to enable:
+    # task = asyncio.create_task(_run_auto_simulation(app))
     yield
+    # task.cancel()
 
 
 app = FastAPI(title="Lorekeeper", lifespan=lifespan)
@@ -52,6 +103,17 @@ def list_scenarios():
         ScenarioSummary(id=s["id"], name=s["name"], genre=s["genre"], tagline=s["tagline"])
         for s in SCENARIOS
     ]
+
+
+@app.get("/scenarios/active/starters")
+def get_starters():
+    scenario = next((s for s in SCENARIOS if s["id"] == active_scenario_id), None)
+    if not scenario:
+        return {}
+    return {
+        npc["id"]: npc.get("starters", [])
+        for npc in scenario["npcs"]
+    }
 
 
 @app.post("/scenarios/{scenario_id}/activate")

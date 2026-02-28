@@ -107,3 +107,8 @@ export async function getScenarios(): Promise<ScenarioSummary[]> {
 export async function activateScenario(id: string): Promise<void> {
   await fetch(`${BASE}/scenarios/${id}/activate`, { method: "POST" });
 }
+
+export async function getStarters(): Promise<Record<string, string[]>> {
+  const res = await fetch(`${BASE}/scenarios/active/starters`);
+  return res.json();
+}

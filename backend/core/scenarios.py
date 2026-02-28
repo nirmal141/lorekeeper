@@ -21,6 +21,11 @@ SCENARIOS = [
                     "but shows kindness to those who earn his trust."
                 ),
                 "goals": ["protect his shop", "find news of his son", "keep the trading post safe"],
+                "starters": [
+                    "What supplies do you have left?",
+                    "Have you heard any news from the north?",
+                    "I'm heading into the Ashwood. Any advice?",
+                ],
             },
             {
                 "id": "mira",
@@ -32,6 +37,11 @@ SCENARIOS = [
                     "to those she considers friends. Her blades are the finest in the region."
                 ),
                 "goals": ["forge a legendary weapon", "protect the trading post", "uncover the source of the bandit raids"],
+                "starters": [
+                    "I need a blade forged for a dangerous journey.",
+                    "What do you know about the bandit raids?",
+                    "You seem like you can handle yourself. What's your story?",
+                ],
             },
         ],
     },
@@ -56,6 +66,11 @@ SCENARIOS = [
                     "privately fears they've been abandoned. She trusts data over people."
                 ),
                 "goals": ["keep the crew alive", "fix the reactor", "find out why command stopped responding"],
+                "starters": [
+                    "Commander, what's the status of the reactor?",
+                    "Has there been any word from high command?",
+                    "I want to help. What do you need from me?",
+                ],
             },
             {
                 "id": "lian",
@@ -67,6 +82,11 @@ SCENARIOS = [
                     "Some crew members think her experiments are connected to the reactor failures."
                 ),
                 "goals": ["complete her research before evacuation", "protect her specimens", "avoid suspicion"],
+                "starters": [
+                    "What exactly are you researching down here?",
+                    "Some crew think your experiments caused the reactor issues.",
+                    "The star is dying. What does that mean for your specimens?",
+                ],
             },
         ],
     },
@@ -91,6 +111,11 @@ SCENARIOS = [
                     "She's tough, sharp-tongued, and the closest thing this town has to a leader now."
                 ),
                 "goals": ["keep the saloon open", "protect the townspeople", "find out who killed the sheriff"],
+                "starters": [
+                    "What happened to Sheriff Callahan?",
+                    "Tell me about the cattle baron.",
+                    "This town looks like it could use some help.",
+                ],
             },
             {
                 "id": "hank",
@@ -102,6 +127,11 @@ SCENARIOS = [
                     "He drinks too much and his hands shake when he draws."
                 ),
                 "goals": ["find the sheriff's killer", "stand up to the cattle baron", "prove he's worthy of the badge"],
+                "starters": [
+                    "Deputy, do you have any leads on the killer?",
+                    "Are you going to stand up to the cattle baron?",
+                    "The sheriff trusted you. What would he want you to do?",
+                ],
             },
         ],
     },
@@ -126,6 +156,11 @@ SCENARIOS = [
                     "Cynical, methodical, and haunted by the cases he couldn't solve."
                 ),
                 "goals": ["find out who killed Holloway", "stay one step ahead of the police", "uncover the conspiracy"],
+                "starters": [
+                    "What did Holloway hire you for before he died?",
+                    "The police say suicide. You don't buy it?",
+                    "Who would want Victor Holloway dead?",
+                ],
             },
             {
                 "id": "ruby",
@@ -137,6 +172,11 @@ SCENARIOS = [
                     "She's scared but won't admit it. She knows more than she's telling."
                 ),
                 "goals": ["stay alive", "protect her secrets", "find out if Holloway's death is connected to her past"],
+                "starters": [
+                    "You were the last person to see Holloway alive. What happened?",
+                    "You look scared, Ruby. Who are you afraid of?",
+                    "What aren't you telling me about Victor?",
+                ],
             },
         ],
     },
@@ -161,6 +201,11 @@ SCENARIOS = [
                     "She believes the demo will save everything if they can just get it working."
                 ),
                 "goals": ["nail the investor demo", "fix the relationship with Marcus", "keep the company alive"],
+                "starters": [
+                    "Priya, what happened with the product last night?",
+                    "How bad are the finances really?",
+                    "What's going on between you and Marcus?",
+                ],
             },
             {
                 "id": "marcus",
@@ -172,6 +217,11 @@ SCENARIOS = [
                     "He's considering walking away but can't abandon what he built."
                 ),
                 "goals": ["fix the crashed product", "have an honest conversation with Priya", "decide if he should stay or leave"],
+                "starters": [
+                    "Marcus, can you fix the product before the demo?",
+                    "Are you thinking about leaving the company?",
+                    "What does Priya keep promising that you can't deliver?",
+                ],
             },
         ],
     },

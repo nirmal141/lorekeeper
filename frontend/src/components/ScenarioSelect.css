@@ -9,6 +9,25 @@
   overflow-y: auto;
 }
 
+.ss-home-btn {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  background: rgba(83, 52, 131, 0.3);
+  border: 1px solid #533483;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ss-home-btn:hover {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+}
+
 .ss-title {
   font-family: var(--font-pixel);
   font-size: 20px;
