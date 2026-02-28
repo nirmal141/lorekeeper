@@ -16,6 +16,14 @@ const GENRE_COLORS: Record<string, { bg: string; text: string; border: string }>
   Modern: { bg: "#0a2e1a", text: "#4ade80", border: "#16a34a" },
 };
 
+const SCENARIO_IMAGES: Record<string, string> = {
+  ashwood: "/ashwood_station.png",
+  starfall: "/starfall_station.png",
+  "dusty-gulch": "/dusty_gulch.png",
+  holloway: "/holloway_case.png",
+  "byte-brew": "/byte_and_brew.png",
+};
+
 export default function ScenarioSelect({ onSelect }: Props) {
   const [scenarios, setScenarios] = useState<ScenarioSummary[]>([]);
   const [activating, setActivating] = useState<string | null>(null);
@@ -76,12 +84,18 @@ export default function ScenarioSelect({ onSelect }: Props) {
                 className="ss-card"
               >
                 <div className="ss-card-inner" onClick={() => !activating && handleSelect(s.id)}>
-                  <span className="ss-genre" style={{ background: colors.bg, color: colors.text, borderColor: colors.border }}>
-                    {s.genre}
-                  </span>
-                  <h3 className="ss-name">{s.name}</h3>
-                  <p className="ss-tagline">{s.tagline}</p>
-                  {activating === s.id && <span className="ss-loading">Loading world...</span>}
+                  <div className="ss-img-wrapper">
+                    <img src={SCENARIO_IMAGES[s.id]} alt={s.name} className="ss-img" />
+                    <div className="ss-img-overlay" />
+                  </div>
+                  <div className="ss-card-text">
+                    <span className="ss-genre" style={{ background: colors.bg, color: colors.text, borderColor: colors.border }}>
+                      {s.genre}
+                    </span>
+                    <h3 className="ss-name">{s.name}</h3>
+                    <p className="ss-tagline">{s.tagline}</p>
+                    {activating === s.id && <span className="ss-loading">Loading world...</span>}
+                  </div>
                 </div>
               </Card>
             </motion.div>
