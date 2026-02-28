@@ -86,7 +86,7 @@ Respond in this EXACT JSON format (no markdown, no code blocks):
 The choices should be things the player might say next. Make them drive the story forward."""
 
         response = self._client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3-flash-preview",
             contents=prompt,
         )
 

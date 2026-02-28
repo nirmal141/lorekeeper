@@ -47,7 +47,7 @@ Respond in this EXACT JSON format (no markdown, no code blocks):
 Only use these NPC IDs: {npc_ids}"""
 
         response = self._client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3-flash-preview",
             contents=prompt,
         )
         data = json.loads(self._clean_json(response.text))
@@ -89,7 +89,7 @@ Write a recap in this EXACT JSON format (no markdown, no code blocks):
 {{"summary": "A dramatic 3-4 sentence narrative recap of what has happened so far, written like a TV show narrator", "key_moments": ["moment 1 in one sentence", "moment 2 in one sentence", "moment 3 in one sentence"]}}"""
 
         response = self._client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3-flash-preview",
             contents=prompt,
         )
         data = json.loads(self._clean_json(response.text))

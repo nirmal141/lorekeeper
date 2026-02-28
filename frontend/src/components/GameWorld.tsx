@@ -67,10 +67,17 @@ export default function GameWorld({ onBack, onHome }: GameWorldProps) {
     init();
 
     // Poll for auto-simulated world changes every 30s
+    let lastHours = -1;
     const poll = setInterval(async () => {
       try {
-        const [w, n, e] = await Promise.all([getWorld(), getNPCs(), getEvents()]);
-        if (w.hours_passed !== world?.hours_passed) {
+        const w = await getWorld();
+        if (lastHours === -1) {
+          lastHours = w.hours_passed;
+          return;
+        }
+        if (w.hours_passed !== lastHours) {
+          lastHours = w.hours_passed;
+          const [n, e] = await Promise.all([getNPCs(), getEvents()]);
           setWorld(w);
           setNpcs(n);
           setEvents(e);
