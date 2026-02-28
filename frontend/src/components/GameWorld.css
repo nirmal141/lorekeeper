@@ -15,6 +15,28 @@
   background: rgba(10, 10, 20, 0.8);
 }
 
+.gw-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gw-worlds-btn {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  background: rgba(83, 52, 131, 0.3);
+  border: 1px solid #533483;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gw-worlds-btn:hover {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+}
+
 .gw-title {
   font-family: var(--font-pixel);
   font-size: 12px;

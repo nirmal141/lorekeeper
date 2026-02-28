@@ -91,3 +91,19 @@ export async function getRecap(): Promise<NarrativeRecap> {
   const res = await fetch(`${BASE}/world/recap`);
   return res.json();
 }
+
+export interface ScenarioSummary {
+  id: string;
+  name: string;
+  genre: string;
+  tagline: string;
+}
+
+export async function getScenarios(): Promise<ScenarioSummary[]> {
+  const res = await fetch(`${BASE}/scenarios`);
+  return res.json();
+}
+
+export async function activateScenario(id: string): Promise<void> {
+  await fetch(`${BASE}/scenarios/${id}/activate`, { method: "POST" });
+}

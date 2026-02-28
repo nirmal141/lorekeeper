@@ -11,19 +11,45 @@ from backend.core.models import SimulationResult, WorldEvent
 @pytest.fixture
 def client(tmp_path):
     os.environ["GEMINI_API_KEY"] = "fake-key"
-    os.environ["DB_PATH"] = str(tmp_path / "test.db")
-    os.environ["INDEX_DIR"] = str(tmp_path / "indexes")
+
+    from backend.core.config import Settings
+    test_settings = Settings(
+        gemini_api_key="fake-key",
+        db_path=str(tmp_path / "test.db"),
+        index_dir=str(tmp_path / "indexes"),
+    )
+
+    def mock_scoped():
+        return test_settings
 
     with patch("backend.main.Client") as mock_client_cls, \
          patch("backend.services.npc_service.genai") as mock_genai, \
-         patch("backend.services.npc_service.GeminiEmbedding"):
+         patch("backend.services.npc_service.GeminiEmbedding"), \
+         patch("backend.main._scoped", mock_scoped), \
+         patch("backend.main.seed_all"):
         mock_genai.Client.return_value = MagicMock()
         mock_temporal = AsyncMock()
         mock_client_cls.connect = AsyncMock(return_value=mock_temporal)
 
-        from llama_index.core.embeddings import MockEmbedding
-        import backend.main as main_mod
-        main_mod.npc_service = main_mod.NPCService(main_mod.settings, embed_model=MockEmbedding(embed_dim=8))
+        # Seed the test DB manually
+        from backend.core.database import get_db, init_db
+        from backend.core.seed import seed_scenario
+        conn = get_db(test_settings)
+        init_db(conn)
+        conn.execute(
+            "INSERT OR IGNORE INTO world_state (id, description, hours_passed) VALUES (1, 'Test world', 0)"
+        )
+        import json as j
+        conn.execute(
+            "INSERT OR IGNORE INTO npcs (id, name, role, backstory, goals, current_mood) VALUES (?, ?, ?, ?, ?, ?)",
+            ("aldric", "Aldric", "merchant", "Old trader", j.dumps(["survive"]), "neutral"),
+        )
+        conn.execute(
+            "INSERT OR IGNORE INTO npcs (id, name, role, backstory, goals, current_mood) VALUES (?, ?, ?, ?, ?, ?)",
+            ("mira", "Mira", "blacksmith", "Strong smith", j.dumps(["forge"]), "neutral"),
+        )
+        conn.commit()
+        conn.close()
 
         from backend.main import app
         with TestClient(app) as c:
@@ -75,16 +101,34 @@ class TestNPCEndpoints:
         resp = c.post("/npc/nobody/chat", json={"player_message": "Hello"})
         assert resp.status_code == 404
 
-    @patch("backend.services.npc_service.NPCService.chat")
-    def test_chat_success(self, mock_chat, client):
+    def test_chat_success(self, client):
         from backend.core.models import ChatResponse
-        mock_chat.return_value = ChatResponse(
+        mock_response = ChatResponse(
             npc_id="aldric", npc_dialogue="Welcome!", memories_retrieved=[]
         )
+        with patch("backend.main._npc_service") as mock_fn:
+            mock_svc = MagicMock()
+            mock_svc.chat = AsyncMock(return_value=mock_response)
+            mock_fn.return_value = mock_svc
+            c, _ = client
+            resp = c.post("/npc/aldric/chat", json={"player_message": "Hello"})
+            assert resp.status_code == 200
+            assert resp.json()["npc_dialogue"] == "Welcome!"
+
+
+class TestScenarios:
+    def test_list_scenarios(self, client):
         c, _ = client
-        resp = c.post("/npc/aldric/chat", json={"player_message": "Hello"})
+        resp = c.get("/scenarios")
         assert resp.status_code == 200
-        assert resp.json()["npc_dialogue"] == "Welcome!"
+        scenarios = resp.json()
+        assert len(scenarios) == 5
+        ids = {s["id"] for s in scenarios}
+        assert "ashwood" in ids
+        assert "starfall" in ids
+        assert "dusty-gulch" in ids
+        assert "holloway" in ids
+        assert "byte-brew" in ids
 
 
 class TestSimulate:

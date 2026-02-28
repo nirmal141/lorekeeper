@@ -1,0 +1,95 @@
+.ss-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: radial-gradient(ellipse at top, #16213e 0%, #0a0a14 100%);
+}
+
+.ss-title {
+  font-family: var(--font-pixel);
+  font-size: 20px;
+  color: var(--accent-gold);
+  text-shadow: 2px 2px 0 #533483;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.ss-subtitle {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.ss-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  max-width: 900px;
+  width: 100%;
+}
+
+.ss-card-wrapper {
+  cursor: pointer;
+}
+
+.ss-card {
+  height: 100%;
+}
+
+.ss-card-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 120px;
+}
+
+.ss-genre {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  padding: 3px 8px;
+  border: 1px solid;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: fit-content;
+}
+
+.ss-name {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: #e0e0e0;
+}
+
+.ss-tagline {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.ss-loading {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--accent-gold);
+  animation: ssPulse 1s ease-in-out infinite;
+}
+
+@keyframes ssPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.ss-tech {
+  margin-top: 40px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}

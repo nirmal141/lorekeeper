@@ -63,3 +63,10 @@ class SimulationResult(BaseModel):
 class NarrativeRecap(BaseModel):
     summary: str
     key_moments: list[str] = []
+
+
+class ScenarioSummary(BaseModel):
+    id: str
+    name: str
+    genre: str
+    tagline: str

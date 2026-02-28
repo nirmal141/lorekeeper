@@ -3,6 +3,31 @@ import { motion, AnimatePresence } from "motion/react";
 import { Button } from "pixel-retroui";
 import "./DialogueBox.css";
 
+function MemoryAccordion({ memories }: { memories: string[] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="db-memories">
+      <button className="db-mem-toggle" onClick={() => setOpen(!open)}>
+        <span className="db-mem-label">memories recalled ({memories.length})</span>
+        <span className={`db-mem-chevron ${open ? "open" : ""}`}>&#9662;</span>
+      </button>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          transition={{ duration: 0.2 }}
+          className="db-mem-content"
+        >
+          {memories.map((m, j) => (
+            <p key={j} className="db-mem-text">{m}</p>
+          ))}
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
 interface DialogueEntry {
   speaker: "player" | "narrator" | string;
   text: string;
@@ -64,17 +89,7 @@ export default function DialogueBox({ entries, loading, onSend, npcName }: Props
               <p className="db-text">{entry.text}</p>
 
               {entry.memories && entry.memories.length > 0 && (
-                <motion.div
-                  className="db-memories"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <span className="db-mem-label">memories recalled</span>
-                  {entry.memories.map((m, j) => (
-                    <p key={j} className="db-mem-text">{m}</p>
-                  ))}
-                </motion.div>
+                <MemoryAccordion memories={entry.memories} />
               )}
             </motion.div>
           ))}

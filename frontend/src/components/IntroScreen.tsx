@@ -43,9 +43,9 @@ export default function IntroScreen({ onEnter }: Props) {
         >
           <Typewriter
             words={[
-              "The trading post at the edge of the Ashwood has seen better days. Northern roads closed. Bandits growing bold. The merchants whisper of dark times ahead...",
+              "In most games, the world freezes when you leave. NPCs forget you. Nothing changes. Lorekeeper is different. Here, NPCs remember everything. The world simulates itself while you are away. When you return, the story has moved on without you...",
             ]}
-            typeSpeed={35}
+            typeSpeed={30}
             cursor
             cursorStyle="_"
           />
@@ -63,7 +63,7 @@ export default function IntroScreen({ onEnter }: Props) {
             shadow="#1a1a2e"
             className="intro-btn"
           >
-            Enter World
+            Choose Your World
           </Button>
         </motion.div>
 

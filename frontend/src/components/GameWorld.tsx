@@ -25,7 +25,11 @@ interface DialogueEntry {
   choices?: string[];
 }
 
-export default function GameWorld() {
+interface GameWorldProps {
+  onBack?: () => void;
+}
+
+export default function GameWorld({ onBack }: GameWorldProps) {
   const [world, setWorld] = useState<WorldState | null>(null);
   const [npcs, setNpcs] = useState<NPC[]>([]);
   const [events, setEvents] = useState<WorldEvent[]>([]);
@@ -137,7 +141,10 @@ export default function GameWorld() {
       transition={{ duration: 0.5 }}
     >
       <div className="gw-topbar">
-        <span className="gw-title">Lorekeeper</span>
+        <div className="gw-topbar-left">
+          {onBack && <button className="gw-worlds-btn" onClick={onBack}>Worlds</button>}
+          <span className="gw-title">Lorekeeper</span>
+        </div>
         <span className="gw-hours">Day {Math.floor((world?.hours_passed ?? 0) / 24) + 1} · Hour {(world?.hours_passed ?? 0) % 24}</span>
       </div>
 
