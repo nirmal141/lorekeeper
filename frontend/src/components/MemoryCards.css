@@ -1,0 +1,38 @@
+.memory-cards {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.memory-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent-purple);
+  animation: memoryPulse 2s ease-in-out infinite;
+}
+
+@keyframes memoryPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.memory-card {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 6px 10px;
+  background: rgba(124, 111, 247, 0.04);
+  border-left: 2px solid rgba(124, 111, 247, 0.4);
+  border-radius: 0 4px 4px 0;
+  line-height: 1.5;
+  animation: memoryFadeIn 0.3s ease both;
+  box-shadow: 0 0 8px rgba(124, 111, 247, 0.08);
+}
+
+@keyframes memoryFadeIn {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}

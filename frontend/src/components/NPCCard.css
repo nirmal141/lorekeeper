@@ -1,0 +1,59 @@
+.npc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.npc-card:hover {
+  border-left-color: rgba(124, 111, 247, 0.4);
+}
+
+.npc-card.selected {
+  border-left-color: var(--accent-purple);
+  background: #1a1a2e;
+}
+
+.npc-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.npc-card-name {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.npc-card-mood {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mood-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mood-text {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: lowercase;
+}
+
+.npc-card-role {
+  font-size: 11px;
+  color: var(--text-muted);
+}

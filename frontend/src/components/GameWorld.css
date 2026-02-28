@@ -1,0 +1,205 @@
+.game-world {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(ellipse at bottom, #16213e 0%, #0a0a14 100%);
+}
+
+/* Top bar */
+.gw-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  border-bottom: 2px solid #533483;
+  background: rgba(10, 10, 20, 0.8);
+}
+
+.gw-title {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--accent-gold);
+}
+
+.gw-hours {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+/* Main layout */
+.gw-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.gw-sidebar {
+  width: 280px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  border-right: 2px solid #533483;
+  background: rgba(10, 10, 20, 0.5);
+}
+
+.gw-card {
+  cursor: default;
+}
+
+.gw-card-title {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.gw-card-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.gw-event-text {
+  font-size: 10px;
+  color: var(--accent-gold);
+  line-height: 1.5;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+/* Architecture */
+.gw-arch-row {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gw-tag {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.gw-tag.purple { background: #533483; color: #e0e0e0; }
+.gw-tag.gold { background: #7d6608; color: #f1c40f; }
+.gw-tag.red { background: #922b21; color: #e74c3c; }
+
+/* Center area */
+.gw-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.gw-prompt {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.gw-npcs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.gw-npc-card {
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.gw-npc-name {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--accent-gold);
+  margin-bottom: 4px;
+}
+
+.gw-npc-role {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.gw-npc-mood {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.gw-mood-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.gw-npc-goal {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.gw-pass-btn {
+  display: block;
+  margin: 32px auto 0;
+  font-family: var(--font-pixel) !important;
+  font-size: 10px !important;
+  padding: 10px 24px !important;
+  cursor: pointer;
+}
+
+.gw-pass-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dialogue area */
+.gw-dialogue-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.gw-dialogue-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.gw-back-btn {
+  font-family: var(--font-pixel) !important;
+  font-size: 8px !important;
+  padding: 6px 12px !important;
+  cursor: pointer;
+}
+
+.gw-talking-to {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--accent-gold);
+}
